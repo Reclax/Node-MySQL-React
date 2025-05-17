@@ -2,7 +2,7 @@
 
 ### Pasos para la Instalación
 
-Veras solo tienen que seguir estos pasos:
+Veran solo tienen que seguir estos pasos:
 
 1. Primero clonan el archivo **.env.template** y renombrar a **.env**, cambiaran dentro de los dos archivos el nombre de **JWT_SEED** a otra semilla em los videos dentro de la **Seccion04** el video **08**.
 
