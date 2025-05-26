@@ -1,16 +1,15 @@
 import { Request, Response } from 'express';
 import { AuthRepository, CustomError, LoginUser, LoginUserDto, RegisterUser, RegisterUserDto } from '../../domain';
-import { UserModel } from '../../data/mongodb';
 
 export class AuthController {
   private static instance: AuthController;
-  
+
   // DI
   private constructor(
     private readonly authRepository: AuthRepository,
   ) {}
 
-  // Método para obtener la instancia unica
+  // Método para obtener la instancia única
   public static getInstance(authRepository: AuthRepository): AuthController {
     if (!AuthController.instance) {
       AuthController.instance = new AuthController(authRepository);
@@ -23,15 +22,14 @@ export class AuthController {
       return res.status(error.statusCode).json({ error: error.message });
     }
 
-    console.log(error); // Winston
+    console.log(error); // Winston u otro logger
     return res.status(500).json({ error: 'Internal Server Error' });
   }
 
   registerUser = (req: Request, res: Response) => {
     const [error, registerUserDto] = RegisterUserDto.create(req.body);
     if (error) return res.status(400).json({ error });
-    
-    // Usando el Singleton de RegisterUser
+
     RegisterUser.getInstance(this.authRepository)
       .execute(registerUserDto!)
       .then(data => res.json(data))
@@ -41,22 +39,20 @@ export class AuthController {
   loginUser = (req: Request, res: Response) => {
     const [error, loginUserDto] = LoginUserDto.create(req.body);
     if (error) return res.status(400).json({ error });
-    
-    // Usando el Singleton de LoginUser
+
     LoginUser.getInstance(this.authRepository)
       .execute(loginUserDto!)
       .then(data => res.json(data))
       .catch(error => this.handleError(error, res));
   }
 
-  getUsers = (req: Request, res: Response) => {
-    UserModel.find()
-      .then(users => {
-        res.json({
-          // users,
-          user: req.body.user
-        }) 
-      })
-      .catch(() => res.status(500).json({ error: 'Internal server error' }))
+  getUsers = async (req: Request, res: Response) => {
+    try {
+      // Usando el repositorio, que ahora debería devolver un array de usuarios tipados.
+      const users = await this.authRepository.getAllUsers();
+      res.json({ users });
+    } catch (error) {
+      this.handleError(error, res);
+    }
   }
 }

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { JwtAdapter } from '../../config';
-import { UserModel } from '../../data/mongodb';
+import { UserModel } from '../../data/mysql/models/user.model';
 
 export class AuthMiddleware {
   private static instance: AuthMiddleware;
@@ -26,7 +26,7 @@ export class AuthMiddleware {
       const payload = await jwt.validateToken<{ id: string }>(token);
       if (!payload) return res.status(401).json({ error: 'Token inválido' });
 
-      const user = await UserModel.findById(payload.id);
+      const user = await UserModel.findByPk(payload.id);
       if (!user) return res.status(401).json({ error: 'Token inválido - usuario no encontrado' });
 
       req.body.user = user;
@@ -37,4 +37,3 @@ export class AuthMiddleware {
     }
   }
 }
-

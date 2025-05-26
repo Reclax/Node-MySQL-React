@@ -1,24 +1,32 @@
-import { AuthDatasource, AuthRepository, LoginUserDto, RegisterUserDto, UserEntity } from '../../domain';
+import { AuthRepository } from '../../domain/repositories/auth.repository';
+import { LoginUserDto, RegisterUserDto } from '../../domain';
+import { UserEntity } from '../../domain/entities/user.entity';
+import { AuthDatasourceImpl } from '../datasources/auth.datasource.impl';
 
-export class AuthRepositoryImpl implements AuthRepository {
+export class AuthRepositoryImpl extends AuthRepository {
   private static instance: AuthRepositoryImpl;
-  
-  private constructor(
-    private readonly authDatasource: AuthDatasource,
-  ) {}
 
-  public static getInstance(authDatasource: AuthDatasource): AuthRepositoryImpl {
+  private constructor(private readonly datasource: AuthDatasourceImpl) {
+    super();
+  }
+
+  static getInstance(datasource: AuthDatasourceImpl) {
     if (!AuthRepositoryImpl.instance) {
-      AuthRepositoryImpl.instance = new AuthRepositoryImpl(authDatasource);
+      AuthRepositoryImpl.instance = new AuthRepositoryImpl(datasource);
     }
     return AuthRepositoryImpl.instance;
   }
 
-  login(loginUserDto: LoginUserDto): Promise<UserEntity> {
-    return this.authDatasource.login(loginUserDto);
+  async login(loginUserDto: LoginUserDto): Promise<UserEntity> {
+    return this.datasource.login(loginUserDto);
   }
-  
-  register(registerUserDto: RegisterUserDto): Promise<UserEntity> {
-    return this.authDatasource.register(registerUserDto);
+
+  async register(registerUserDto: RegisterUserDto): Promise<UserEntity> {
+    return this.datasource.register(registerUserDto);
+  }
+
+  async getAllUsers(): Promise<UserEntity[]> {
+    // Delegas la consulta al datasource, ajusta el método según tu datasource
+    return this.datasource.getAllUsers();
   }
 }
