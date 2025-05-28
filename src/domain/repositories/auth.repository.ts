@@ -8,5 +8,6 @@ export abstract class AuthRepository {
 
   // Agrega este método para soportar getUsers en el controlador
   abstract getAllUsers(): Promise<UserEntity[]>;
+
 }
 
